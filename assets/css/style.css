@@ -17,13 +17,20 @@ body {
 }
 
 .card {
-	background-color: rgba(255, 255, 255, 0.8);
 	/* Add a light background to cards for readability */
+	background-color: rgba(255, 255, 255, 0.8);
 	transition: transform 0.2s;
 }
 
 .card:hover {
 	transform: scale(1.05);
+}
+
+/* revert hover declarations for touch devices */
+@media (pointer: coarse) {
+	.card:hover {
+		all: revert-layer;
+	}
 }
 
 .card a {
@@ -32,6 +39,6 @@ body {
 }
 
 .card-title {
-	font-size: 1.25rem;
 	/* Adjusting the title size for better visibility */
+	font-size: 1.25rem;
 }
