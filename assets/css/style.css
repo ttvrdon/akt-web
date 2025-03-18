@@ -27,11 +27,11 @@ body {
 }
 
 /* revert hover declarations for touch devices */
-@media (pointer: coarse) {
+/* @media (pointer: coarse) {
 	.card:hover {
 		all: revert-layer;
 	}
-}
+} */
 
 .card a {
 	color: inherit;
