@@ -1,6 +1,6 @@
 {
     "globalHeaders": {
-        "frame-ancestors": "'self' mango-cliff-0bdb6f403-7.westeurope.4.azurestaticapps.net *.westeurope.4.azurestaticapps.net",
+        "content-security-policy": "frame-ancestors 'self' mango-cliff-0bdb6f403-7.westeurope.4.azurestaticapps.net *.westeurope.4.azurestaticapps.net; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.azureedge.net https://*.azurewebsites.net https://*.microsoft.com https://*.microsoftonline.com https://*.msftauth.net https://*.msftauthimages.net https://*.msftauthimages.com; img-src 'self' data: blob: https:; style-src 'self' 'unsafe-inline' https:; base-uri 'self'; form-action 'self'; upgrade-insecure-requests",
         "X-Frame-Options": "ALLOWALL",
         "Referrer-Policy": "no-referrer"
     }
