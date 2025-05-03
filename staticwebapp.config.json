@@ -1,5 +1,7 @@
 {
     "globalHeaders": {
-        "X-Frame-Options": "ALLOWALL"
+        "frame-ancestors": "'self' mango-cliff-0bdb6f403-7.westeurope.4.azurestaticapps.net *.westeurope.4.azurestaticapps.net",
+        "X-Frame-Options": "ALLOWALL",
+        "Referrer-Policy": "no-referrer"
     }
 }
