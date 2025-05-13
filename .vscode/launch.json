@@ -9,6 +9,12 @@
             "request": "launch",
             "name": "Open index.html",
             "file": "c:\\Projects\\akt-web\\index.html"
+        },
+        {
+            "name": "Attach to .NET Functions",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": "${command:azureFunctions.pickProcess}"
         }
     ]
 }
