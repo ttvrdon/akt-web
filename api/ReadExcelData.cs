@@ -1,21 +1,23 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Threading.Tasks;
 
-namespace AktWeb.Api;
+namespace AktWeb.Functions;
 
-public static class ReadExcelData
+public class ReadExcelData
 {
-    [FunctionName("ReadExcelData")]
-    public static async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "readExcelData")] HttpRequest req,
-        ILogger log)
+    private readonly ILogger<ReadExcelData> _logger;
+
+    public ReadExcelData(ILogger<ReadExcelData> logger)
     {
-        log.LogInformation("Processing request in ReadExcelData Function.");
+        _logger = logger;
+    }
+
+    [Function("ReadExcelData")]
+    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
+    {
+        _logger.LogInformation("Processing request in ReadExcelData Function.");
 
         var excelSharingLink = Environment.GetEnvironmentVariable("ExcelSharingLink");
 
