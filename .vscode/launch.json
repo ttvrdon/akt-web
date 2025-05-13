@@ -8,7 +8,7 @@
             "type": "chrome",
             "request": "launch",
             "name": "Open index.html",
-            "file": "c:\\Projects\\akt-web\\index.html"
+            "file": "c:\\Projects\\akt-web\\web\\index.html"
         },
         {
             "name": "Attach to .NET Functions",

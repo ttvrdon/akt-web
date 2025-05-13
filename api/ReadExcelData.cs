@@ -15,7 +15,7 @@ public class ReadExcelData
     }
 
     [Function("ReadExcelData")]
-    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
+    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
     {
         _logger.LogInformation("Processing request in ReadExcelData Function.");
 
