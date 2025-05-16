@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (data !== null) {
         flightHoursTotalElement.textContent = `${data.totalHours}:${data.totalMinutes}`;
-        flightHoursGoElement.textContent = `${data.fromGoHours}:${data.fromGoMinutes}`;
+        flightHoursGoElement.textContent = `${data.fromGOHours}:${data.fromGOMinutes}`;
         flightHoursServiceElement.textContent = `${data.nextServiceInHours}:${data.nextServiceInMinutes}`;
 
         tableElement.classList.remove("d-none");
