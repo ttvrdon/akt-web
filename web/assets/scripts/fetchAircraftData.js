@@ -4,8 +4,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const flightHoursServiceElement = document.getElementById("flight-hours-service");
 
     const loaderElement = document.getElementById("data-loader");
-    const dataErrorElement = document.getElementById("data-error");
     const tableElement = document.getElementById("data-table");
+    const dataErrorElement = document.getElementById("data-error");
 
     var data = await loadAircraftData();
     loaderElement.classList.add("d-none");
