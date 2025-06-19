@@ -8,6 +8,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     const dataErrorElement = document.getElementById("data-error");
 
     var data = await loadAircraftData();
+    // var data = {
+    //     totalHours: "100",
+    //     totalMinutes: "30",
+    //     fromGOHours: "50",
+    //     fromGOMinutes: "15",
+    //     nextServiceInHours: "10",
+    //     nextServiceInMinutes: "5"
+    // }
     loaderElement.classList.add("d-none");
 
     if (data !== null) {
@@ -27,13 +35,13 @@ async function loadAircraftData() {
         const response = await fetch("/api/GetAircraftData");
 
         if (!response.ok) {
-            console.error("Chyba při načítání dat z API:", response.status, response.statusText);
+            console.error("Error loading data from API:", response.status, response.statusText);
             return null;
         }
 
         return await response.json();
     } catch (error) {
-        console.error("Chyba při načítání dat:", error);
+        console.error("Error loading data:", error);
         return null;
     }
 
