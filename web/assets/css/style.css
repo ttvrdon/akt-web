@@ -26,13 +26,6 @@ body {
 	transform: scale(1.05);
 }
 
-/* revert hover declarations for touch devices */
-/* @media (pointer: coarse) {
-	.card:hover {
-		all: revert-layer;
-	}
-} */
-
 .card a {
 	color: inherit;
 	text-decoration: none;

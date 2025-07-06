@@ -52,25 +52,45 @@ public class GetAircraftData
         using var stream = new MemoryStream(fileBytes);
         using var workbook = new XLWorkbook(stream);
 
-        var table = workbook.Table("Table2");
+        var table = workbook.Table("Table1");
 
-        var totalStr = table.Row(2).Cell(2).GetString();
-        var fromGOStr = table.Row(2).Cell(3).GetString();
-        var nextServiceInStr = table.Row(2).Cell(4).GetString();
+        var totalDouble = table.Row(2).Cell(4).GetValue<double>();
+        var fromReconstructionDouble = table.Row(2).Cell(5).GetValue<double>();
+        var fromAnnualDouble = table.Row(2).Cell(6).GetValue<double>();
+        var nextServiceInDouble = table.Row(2).Cell(7).GetValue<double>();
 
-        var total = totalStr.Split(':').Select(int.Parse).ToArray();
-        var fromGO = fromGOStr.Split(':').Select(int.Parse).ToArray();
-        var nextServiceIn = nextServiceInStr.Split(':').Select(int.Parse).ToArray();
+        var total = GetHoursAndMinutes(totalDouble);
+        var fromReconstruction = GetHoursAndMinutes(fromReconstructionDouble);
+        var fromAnnual = GetHoursAndMinutes(fromAnnualDouble);
+        var nextServiceIn = GetHoursAndMinutes(nextServiceInDouble);
 
         return new AircraftData
         {
             Aircraft = table.Row(2).Cell(1).GetString(),
-            TotalHours = total[0],
-            TotalMinutes = total[1],
-            FromGOHours = fromGO[0],
-            FromGOMinutes = fromGO[1],
-            NextServiceInHours = nextServiceIn[0],
-            NextServiceInMinutes = nextServiceIn[1],
+            TotalHours = total.Hours,
+            TotalMinutes = total.Minutes,
+            FromReconstructionHours = fromReconstruction.Hours,
+            FromReconstructionMinutes = fromReconstruction.Minutes,
+            FromAnnualHours = fromAnnual.Hours,
+            FromAnnualMinutes = fromAnnual.Minutes,
+            NextServiceInHours = nextServiceIn.Hours,
+            NextServiceInMinutes = nextServiceIn.Minutes,
         };
+    }
+
+    private static (int Hours, int Minutes) GetHoursAndMinutes(double excelTimeDouble)
+    {
+        // Convert Excel time (fraction of a day) to TimeSpan
+        var time = TimeSpan.FromDays(excelTimeDouble);
+
+        // Round total minutes to nearest 5
+        int totalMinutes = (int)Math.Round(time.TotalMinutes / 5.0) * 5;
+
+        // Convert back to TimeSpan
+        var roundedTime = TimeSpan.FromMinutes(totalMinutes);
+
+
+
+        return ((int)roundedTime.TotalHours, roundedTime.Minutes);
     }
 }
