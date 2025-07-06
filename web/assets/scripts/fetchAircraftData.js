@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", async () => {
     const flightHoursTotalElement = document.getElementById("flight-hours-total");
-    const flightHoursGoElement = document.getElementById("flight-hours-go");
+    const flightHoursReconstructionElement = document.getElementById("flight-hours-reconstruction");
+    const flightHoursAnnualElement = document.getElementById("flight-hours-annual");
     const flightHoursServiceElement = document.getElementById("flight-hours-service");
 
     const loaderElement = document.getElementById("data-loader");
@@ -11,17 +12,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     // var data = {
     //     totalHours: "100",
     //     totalMinutes: "30",
-    //     fromGOHours: "50",
-    //     fromGOMinutes: "15",
+    //     fromReconstructionHours: "350",
+    //     fromReconstructionMinutes: "45",
+    //     fromAnnualHours: "50",
+    //     fromAnnualMinutes: "15",
     //     nextServiceInHours: "10",
     //     nextServiceInMinutes: "5"
     // }
     loaderElement.classList.add("d-none");
 
     if (data !== null) {
-        flightHoursTotalElement.textContent = `${data.totalHours}:${data.totalMinutes}`;
-        flightHoursGoElement.textContent = `${data.fromGOHours}:${data.fromGOMinutes}`;
-        flightHoursServiceElement.textContent = `${data.nextServiceInHours}:${data.nextServiceInMinutes}`;
+        flightHoursTotalElement.textContent = formatTime(data.totalHours, data.totalMinutes);
+        flightHoursReconstructionElement.textContent = formatTime(data.fromReconstructionHours, data.fromReconstructionMinutes);
+        flightHoursAnnualElement.textContent = formatTime(data.fromAnnualHours, data.fromAnnualMinutes);
+        flightHoursServiceElement.textContent = formatTime(data.nextServiceInHours, data.nextServiceInMinutes);
 
         tableElement.classList.remove("d-none");
     } else {
@@ -29,6 +33,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
 });
+
+function formatTime(hours, minutes) {
+    return `${hours}:${String(minutes).padStart(2, '0')}`;
+}
 
 async function loadAircraftData() {
     try {
