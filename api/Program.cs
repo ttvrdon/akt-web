@@ -1,6 +1,9 @@
 using AktWeb.Functions;
-using Microsoft.Azure.Functions.Worker;
+using AktWeb.Functions.BlobStorage;
+using AktWeb.Functions.Caching;
+using AktWeb.Functions.Extensions;
 using Microsoft.Azure.Functions.Worker.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -8,12 +11,13 @@ var builder = FunctionsApplication.CreateBuilder(args);
 
 builder.ConfigureFunctionsWebApplication();
 
-builder.Services
-    .AddApplicationInsightsTelemetryWorkerService()
-    .ConfigureFunctionsApplicationInsights();
+var appConfig = builder.Configuration.Get<AppConfiguration>() ?? throw new InvalidOperationException($"Config is required");
+builder.Services.AddSingleton(appConfig);
 
-builder.Services.Configure<AppConfiguration>(builder.Configuration);
-builder.Services.AddMemoryCache();
+builder.Services.AddGraphServiceClient(appConfig);
+builder.Services.AddStorageClient(appConfig);
+
 builder.Services.AddSingleton<AircraftDataCache>();
+builder.Services.AddSingleton<StorageClient>();
 
 builder.Build().Run();

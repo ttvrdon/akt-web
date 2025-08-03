@@ -1,9 +1,12 @@
+using AktWeb.Functions.BlobStorage;
+using AktWeb.Functions.Caching;
+using AktWeb.Functions.Model;
 using ClosedXML.Excel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using Microsoft.Graph;
 
 namespace AktWeb.Functions.Functions;
 
@@ -11,16 +14,22 @@ public class GetAircraftData
 {
     private readonly AppConfiguration _configuration;
     private readonly ILogger<GetAircraftData> _logger;
-    private readonly AircraftDataCache _cache;
+    private readonly AircraftDataCache _dataCache;
+    private readonly StorageClient _storageClient;
+    private readonly GraphServiceClient _graphClient;
 
     public GetAircraftData(
         ILogger<GetAircraftData> logger,
-        IOptions<AppConfiguration> configuration,
-        AircraftDataCache cache)
+        AppConfiguration configuration,
+        AircraftDataCache cache,
+        GraphServiceClient graphClient,
+        StorageClient storageClient)
     {
-        _configuration = configuration.Value;
+        _configuration = configuration;
         _logger = logger;
-        _cache = cache;
+        _dataCache = cache;
+        _graphClient = graphClient;
+        _storageClient = storageClient;
     }
 
     [Function(nameof(GetAircraftData))]
@@ -30,7 +39,13 @@ public class GetAircraftData
 
         try
         {
-            var aircraftData = await _cache.GetCachedAircraftData(() => DownloadFromExcelAsync(_configuration.ExcelSharingLink));
+            if (_dataCache.LastCacheReloaded + _configuration.CacheExpiry < DateTimeOffset.UtcNow)
+            {
+                _logger.LogInformation("Cache is stale. Triggering cache reload.");
+                await ReloadCache();
+            }
+
+            var aircraftData = await _dataCache.GetCachedAircraftData(_storageClient.GetAircraftData);
 
             return new OkObjectResult(aircraftData);
         }
@@ -41,15 +56,32 @@ public class GetAircraftData
         }
     }
 
-
-    private static async Task<AircraftData> DownloadFromExcelAsync(string sharingLink)
+    private async Task ReloadCache()
     {
-        using var client = new HttpClient();
+        var lastUpdated = await _dataCache.GetCachedLastUpdated(_storageClient.GetLastUpdated);
 
-        // Convert OneDrive sharing link to direct download link
-        var fileBytes = await client.GetByteArrayAsync(sharingLink);
+        var drive = await _graphClient.Sites[_configuration.SharepointSiteId].Drive.GetAsync();
+        var fileInfo = await _graphClient.Drives[drive!.Id].Root.ItemWithPath(_configuration.SharepointFilePath).GetAsync();
 
-        using var stream = new MemoryStream(fileBytes);
+        var excelLastUpdated = fileInfo!.LastModifiedDateTime!.Value;
+
+        if (excelLastUpdated > lastUpdated)
+        {
+            _logger.LogInformation("Excel file has been updated. Downloading new data...");
+
+            var contentRequest = _graphClient.Drives[drive.Id].Items[fileInfo.Id].Content;
+            var aircraftData = await DownloadFromExcelAsync(contentRequest);
+
+            await _storageClient.SetAircraftData(excelLastUpdated, aircraftData);
+            await _dataCache.RefreshCache(excelLastUpdated, aircraftData);
+        }
+
+        _dataCache.LastCacheReloaded = DateTimeOffset.UtcNow;
+    }
+
+    private static async Task<AircraftData> DownloadFromExcelAsync(Microsoft.Graph.Drives.Item.Items.Item.Content.ContentRequestBuilder contentRequest)
+    {
+        using var stream = await contentRequest.GetAsync();
         using var workbook = new XLWorkbook(stream);
 
         var table = workbook.Table("Table1");
@@ -88,8 +120,6 @@ public class GetAircraftData
 
         // Convert back to TimeSpan
         var roundedTime = TimeSpan.FromMinutes(totalMinutes);
-
-
 
         return ((int)roundedTime.TotalHours, roundedTime.Minutes);
     }

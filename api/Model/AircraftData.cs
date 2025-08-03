@@ -1,4 +1,5 @@
-﻿namespace AktWeb.Functions;
+﻿namespace AktWeb.Functions.Model;
+
 public class AircraftData
 {
     public required string Aircraft { get; set; }
