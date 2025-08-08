@@ -14,7 +14,6 @@ builder.ConfigureFunctionsWebApplication();
 var appConfig = builder.Configuration.Get<AppConfiguration>() ?? throw new InvalidOperationException($"Config is required");
 builder.Services.AddSingleton(appConfig);
 
-builder.Services.AddGraphServiceClient(appConfig);
 builder.Services.AddStorageClient(appConfig);
 
 builder.Services.AddSingleton<AircraftDataCache>();

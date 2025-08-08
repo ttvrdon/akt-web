@@ -7,7 +7,6 @@ namespace AktWeb.Functions.BlobStorage;
 public class StorageClient
 {
     private const string AircraftDataPropertyName = "data";
-    private const string LastUpdatedPropertyName = "lastUpdated";
 
     private readonly BlobServiceClient _blobService;
     private readonly AppConfiguration _configuration;
@@ -25,30 +24,12 @@ public class StorageClient
         };
     }
 
-    public async Task<AircraftData> GetAircraftData()
+    public async Task<AircraftRawData> GetAircraftData()
     {
         var data = await GetMetadata(AircraftDataPropertyName);
 
-        return JsonSerializer.Deserialize<AircraftData>(data, _jsonSerializerOptions)
-            ?? throw new InvalidOperationException($"Failed to deserialize '{AircraftDataPropertyName}' metadata to AircraftData.");
-    }
-
-    public async Task<DateTimeOffset> GetLastUpdated()
-    {
-        var data = await GetMetadata(LastUpdatedPropertyName);
-        return DateTimeOffset.Parse(data);
-    }
-
-    public async Task SetAircraftData(DateTimeOffset lastUpdated, AircraftData data)
-    {
-        var containerClient = _blobService.GetBlobContainerClient(_configuration.DataContainerName);
-        var blobClient = containerClient.GetBlobClient(_configuration.DataBlobName);
-        var metadata = new Dictionary<string, string>
-        {
-            { AircraftDataPropertyName, JsonSerializer.Serialize(data, _jsonSerializerOptions) },
-            { LastUpdatedPropertyName, lastUpdated.ToString("o") }
-        };
-        await blobClient.SetMetadataAsync(metadata);
+        return JsonSerializer.Deserialize<AircraftRawData>(data, _jsonSerializerOptions)
+            ?? throw new InvalidOperationException($"Failed to deserialize '{AircraftDataPropertyName}' metadata to AircraftRawData.");
     }
 
     private async Task<string> GetMetadata(string key)

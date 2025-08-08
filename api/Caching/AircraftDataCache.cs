@@ -1,69 +1,35 @@
 ﻿using AktWeb.Functions.Model;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 
 namespace AktWeb.Functions.Caching;
 
 public class AircraftDataCache
 {
-    private DateTimeOffset? _cachedLastUpdated;
-    private AircraftData? _cachedData;
+    private const string CacheKey = "aircraft";
+    private readonly IMemoryCache _memoryCache;
+    private readonly AppConfiguration _configuration;
 
-    private readonly SemaphoreSlim _semaphore = new(1, 1);
-
-    public DateTimeOffset LastCacheReloaded { get; set; } = DateTimeOffset.MinValue;
-
-    public async Task<DateTimeOffset> GetCachedLastUpdated(Func<Task<DateTimeOffset>> getter)
+    public AircraftDataCache(IMemoryCache memoryCache, IOptions<AppConfiguration> configuration)
     {
-        if (_cachedLastUpdated == null)
-        {
-            await _semaphore.WaitAsync();
-            try
-            {
-                if (_cachedLastUpdated == null)
-                {
-                    _cachedLastUpdated = await getter();
-                }
-            }
-            finally
-            {
-                _semaphore.Release();
-            }
-        }
-
-        return _cachedLastUpdated!.Value;
+        _memoryCache = memoryCache;
+        _configuration = configuration.Value;
     }
 
-    public async Task<AircraftData> GetCachedAircraftData(Func<Task<AircraftData>> getter)
+    public async Task<AircraftData> GetCachedAircraftData(Func<Task<AircraftData>> dataGetter)
     {
-        if (_cachedData == null)
+        // Try to get from cache
+        if (!_memoryCache.TryGetValue(CacheKey, out AircraftData? data))
         {
-            await _semaphore.WaitAsync();
-            try
-            {
-                if (_cachedData == null)
-                {
-                    _cachedData = await getter();
-                }
-            }
-            finally
-            {
-                _semaphore.Release();
-            }
+            data = await dataGetter();
+
+            // Set cache with expiration
+            var cacheEntryOptions = new MemoryCacheEntryOptions()
+                .SetAbsoluteExpiration(_configuration.CacheExpiry);
+
+            _memoryCache.Set(CacheKey, data, cacheEntryOptions);
         }
 
-        return _cachedData!;
-    }
-
-    public async Task RefreshCache(DateTimeOffset lastUpdated, AircraftData data)
-    {
-        await _semaphore.WaitAsync();
-        try
-        {
-            _cachedLastUpdated = lastUpdated;
-            _cachedData = data;
-        }
-        finally
-        {
-            _semaphore.Release();
-        }
+        return data!;
     }
 }
