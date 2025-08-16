@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     //     fromReconstructionMinutes: "45",
     //     fromAnnualHours: "50",
     //     fromAnnualMinutes: "15",
-    //     nextServiceInHours: "10",
+    //     nextServiceInHours: "-10",
     //     nextServiceInMinutes: "5"
     // }
     loaderElement.classList.add("d-none");
@@ -26,6 +26,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         flightHoursReconstructionElement.textContent = formatTime(data.fromReconstructionHours, data.fromReconstructionMinutes);
         flightHoursAnnualElement.textContent = formatTime(data.fromAnnualHours, data.fromAnnualMinutes);
         flightHoursServiceElement.textContent = formatTime(data.nextServiceInHours, data.nextServiceInMinutes);
+
+        if (data.nextServiceInHours < 0) {
+            flightHoursServiceElement.classList.add("text-danger");
+        } else {
+            flightHoursServiceElement.classList.remove("text-danger");
+        }
 
         tableElement.classList.remove("d-none");
     } else {
