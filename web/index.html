@@ -14,14 +14,14 @@
 
   <link rel="stylesheet" href="assets/css/style.css">
 
-  <!-- Bootstrap 5.3.7 -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
-
+  <!-- Bootstrap 5.3.8 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
   <!-- Bootstrap-icons 1.13.1 -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 
   <script src="assets/scripts/fetchAircraftData.js" defer></script>
+  <script src="assets/scripts/fetchFuelData.js" defer></script>
   <script src="assets/scripts/copyButton.js" defer></script>
 </head>
 
@@ -104,9 +104,21 @@
         <div class="card card-body flex-fill">
           <a href="https://forms.office.com/e/tvVuQtZk14" class="text-center text-decoration-none">
             <div class="card-body">
+              <h5 class="card-title">Evidence Brány</h5>
+              <p class="card-text">Formulář evidence brány č. 10</p>
+              <img src="assets/images/evidence-brany.webp" class="img-fluid w-50" />
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="col-lg-3 mb-3 d-flex">
+        <div class="card card-body flex-fill">
+          <a href="https://forms.office.com/e/tvVuQtZk14" class="text-center text-decoration-none">
+            <div class="card-body">
               <h5 class="card-title">Kniha letů</h5>
-              <p class="card-text">Formulář vyúčtování a evidence letů</p>
-              <img src="assets/images/ms-forms.webp" class="img-fluid w-50" />
+              <p class="card-text">Formulář evidence letů</p>
+              <img src="assets/images/kniha-letu.webp" class="img-fluid w-50" />
             </div>
           </a>
         </div>
@@ -120,21 +132,21 @@
             <!-- Table wrapper with relative positioning -->
             <div class="position-relative" style="min-height: 120px;">
               <!-- Spinner overlay with message -->
-              <div id="data-loader" class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center bg-white text-center">
+              <div id="aircraft-data-loader" class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center bg-white text-center">
                 <div class="spinner-border text-primary mb-2" style="width: 1.5rem; height: 1.5rem;" role="status">
                   <span class="visually-hidden">Načítání...</span>
                 </div>
                 <div class="text-muted small">Načítání dat…</div>
               </div>
               <!-- Error message overlay -->
-              <div id="data-error" class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center bg-white text-center d-none">
+              <div id="aircraft-data-error" class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center bg-white text-center d-none">
                 <div class="text-danger mb-2">
                   <i class="bi bi-exclamation-triangle-fill"></i>
                 </div>
                 <div class="text-danger small">Nepodařilo se načíst data</div>
               </div>
               <!-- Table itself -->
-              <table class="table table-striped mb-0 d-none" id="data-table">
+              <table class="table table-striped mb-0 d-none" id="aircraft-data-table">
                 <tbody>
                   <tr>
                     <td class="align-left">Celkový:</td>
@@ -159,6 +171,41 @@
         </div>
       </div>
 
+      <div class="col-lg-3 mb-3 d-flex">
+        <div class="card card-body flex-fill">
+          <div class="card-body text-center text-decoration-none">
+            <h5 class="card-title mb-3">Palivo</h5>
+
+            <!-- Table wrapper with relative positioning -->
+            <div class="position-relative" style="min-height: 120px;">
+              <!-- Spinner overlay with message -->
+              <div id="fuel-data-loader" class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center bg-white text-center">
+                <div class="spinner-border text-primary mb-2" style="width: 1.5rem; height: 1.5rem;" role="status">
+                  <span class="visually-hidden">Načítání...</span>
+                </div>
+                <div class="text-muted small">Načítání dat…</div>
+              </div>
+              <!-- Error message overlay -->
+              <div id="fuel-data-error" class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center bg-white text-center d-none">
+                <div class="text-danger mb-2">
+                  <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+                <div class="text-danger small">Nepodařilo se načíst data</div>
+              </div>
+              <!-- Table itself -->
+              <table class="table table-striped mb-0 d-none" id="fuel-data-table">
+                <tbody>
+                  <tr>
+                    <td class="align-left">Palivo v přívěsu:</td>
+                    <td id="fuel-remaining" class="align-middle text-end">6666:66</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <h2 id="school" class="text-center my-5">Výcvik pilotů</h2>
@@ -171,7 +218,7 @@
             <div class="card-body">
               <h5 class="card-title">Dokumenty</h5>
               <p class="card-text">Dokumenty k leteckému výcviku</p>
-              <img src="assets/images/ms-sharepoint.webp" class="img-fluid w-50" />
+              <img src="assets/images/sharepoint-school.webp" class="img-fluid w-50" />
             </div>
           </a>
         </div>
@@ -183,7 +230,7 @@
             <div class="card-body">
               <h5 class="card-title">Safety hazard</h5>
               <p class="card-text">Formulář hlášení ohrožení bezpečnosti</p>
-              <img src="assets/images/ms-forms.webp" class="img-fluid w-50" />
+              <img src="assets/images/safety-hazard.webp" class="img-fluid w-50" />
             </div>
           </a>
         </div>

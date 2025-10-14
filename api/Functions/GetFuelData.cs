@@ -1,6 +1,5 @@
 using AktWeb.Functions.BlobStorage;
 using AktWeb.Functions.Caching;
-using AktWeb.Functions.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
@@ -8,14 +7,14 @@ using Microsoft.Extensions.Logging;
 
 namespace AktWeb.Functions.Functions;
 
-public class GetAircraftData
+public class GetFuelData
 {
-    private readonly ILogger<GetAircraftData> _logger;
+    private readonly ILogger<GetFuelData> _logger;
     private readonly DataCache _dataCache;
     private readonly StorageClient _storageClient;
 
-    public GetAircraftData(
-        ILogger<GetAircraftData> logger,
+    public GetFuelData(
+        ILogger<GetFuelData> logger,
         DataCache cache,
         StorageClient storageClient)
     {
@@ -24,20 +23,19 @@ public class GetAircraftData
         _storageClient = storageClient;
     }
 
-    [Function(nameof(GetAircraftData))]
+    [Function(nameof(GetFuelData))]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
     {
-        _logger.LogInformation("Processing request in GetAircraftData Function.");
+        _logger.LogInformation("Processing request in GetFuelData Function.");
 
         try
         {
-            var aircraftData = await _dataCache.GetCachedAircraftData(async () =>
+            var fuelData = await _dataCache.GetCachedFuelData(async () =>
             {
-                var rawData = await _storageClient.GetAircraftData();
-                return rawData.ToAircraftData();
+                return await _storageClient.GetFuelData();
             });
 
-            return new OkObjectResult(aircraftData);
+            return new OkObjectResult(fuelData);
         }
         catch (Exception ex)
         {

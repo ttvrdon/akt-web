@@ -16,7 +16,7 @@ builder.Services.AddSingleton(appConfig);
 
 builder.Services.AddStorageClient(appConfig);
 
-builder.Services.AddSingleton<AircraftDataCache>();
+builder.Services.AddSingleton<DataCache>();
 builder.Services.AddSingleton<StorageClient>();
 
 builder.Build().Run();

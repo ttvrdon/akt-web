@@ -4,17 +4,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     const flightHoursAnnualElement = document.getElementById("flight-hours-annual");
     const flightHoursServiceElement = document.getElementById("flight-hours-service");
 
-    const loaderElement = document.getElementById("data-loader");
-    const tableElement = document.getElementById("data-table");
-    const dataErrorElement = document.getElementById("data-error");
+    const loaderElement = document.getElementById("aircraft-data-loader");
+    const tableElement = document.getElementById("aircraft-data-table");
+    const dataErrorElement = document.getElementById("aircraft-data-error");
 
     var data = await loadAircraftData();
     // var data = {
-    //     totalHours: "100",
+    //     totalHours: "6542",
     //     totalMinutes: "30",
     //     fromReconstructionHours: "350",
     //     fromReconstructionMinutes: "45",
-    //     fromAnnualHours: "50",
+    //     fromAnnualHours: "150",
     //     fromAnnualMinutes: "15",
     //     nextServiceInHours: "-10",
     //     nextServiceInMinutes: "5"
