@@ -47,7 +47,7 @@ function formatTime(hours, minutes) {
 
 async function loadAircraftData() {
     try {
-        const response = await fetch("/api/GetAircraftData");
+        const response = await fetch("/api/aircraft/OK-BUK");
 
         if (!response.ok) {
             console.error("Error loading data from API:", response.status, response.statusText);
