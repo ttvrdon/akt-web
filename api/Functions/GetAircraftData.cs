@@ -50,8 +50,30 @@ public class GetAircraftData
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting data from storage");
-            throw;
+            // Build an error payload but STILL return 200
+            var error = ErrorEnvelope.FromException(ex);
+
+            var ok = req.CreateResponse(HttpStatusCode.OK);
+            await ok.WriteAsJsonAsync(error, ct); // Response is 200 with exception detail in body
+            return ok;
+
+            //_logger.LogError(ex, "Error getting data from storage");
+            //throw;
         }
     }
+}
+
+
+public record ErrorEnvelope(
+    string Type,
+    string Message,
+    string? StackTrace,
+    ErrorEnvelope? Inner)
+{
+    public static ErrorEnvelope FromException(Exception ex) =>
+        new(
+            Type: ex.GetType().FullName ?? "Exception",
+            Message: ex.Message,
+            StackTrace: ex.ToString(),            // ex.ToString() includes call stack and inner chains
+            Inner: ex.InnerException is null ? null : FromException(ex.InnerException));
 }
