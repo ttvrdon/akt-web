@@ -41,8 +41,15 @@ public class GetFuelData
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting data from storage");
-            throw;
+            // Build an error payload but STILL return 200
+            var error = ErrorEnvelope.FromException(ex);
+
+            var ok = req.CreateResponse(HttpStatusCode.OK);
+            await ok.WriteAsJsonAsync(error, ct); // Response is 200 with exception detail in body
+            return ok;
+
+            //_logger.LogError(ex, "Error getting data from storage");
+            //throw;
         }
     }
 }
