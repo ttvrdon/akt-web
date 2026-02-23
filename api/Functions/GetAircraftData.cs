@@ -1,10 +1,10 @@
-using AktWeb.Functions.BlobStorage;
 using AktWeb.Functions.Caching;
 using AktWeb.Functions.Model;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+using AktWeb.Functions.TableStorage;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
+using System.Net;
 
 namespace AktWeb.Functions.Functions;
 
@@ -12,12 +12,12 @@ public class GetAircraftData
 {
     private readonly ILogger<GetAircraftData> _logger;
     private readonly DataCache _dataCache;
-    private readonly StorageClient _storageClient;
+    private readonly TableStorageClient _storageClient;
 
     public GetAircraftData(
         ILogger<GetAircraftData> logger,
         DataCache cache,
-        StorageClient storageClient)
+        TableStorageClient storageClient)
     {
         _logger = logger;
         _dataCache = cache;
@@ -25,19 +25,28 @@ public class GetAircraftData
     }
 
     [Function(nameof(GetAircraftData))]
-    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
+    public async Task<HttpResponseData> Run(
+        [HttpTrigger(
+            AuthorizationLevel.Anonymous,
+            "get",
+            Route = "aircraft/{aircraftId}")]
+        HttpRequestData req,
+        string aircraftId,
+        CancellationToken ct)
     {
         _logger.LogInformation("Processing request in GetAircraftData Function.");
 
         try
         {
-            var aircraftData = await _dataCache.GetCachedAircraftData(async () =>
+            var aircraftData = await _dataCache.GetCachedAircraftData(aircraftId, async () =>
             {
-                var rawData = await _storageClient.GetAircraftData();
+                var rawData = await _storageClient.GetAircraftData(aircraftId, ct);
                 return rawData.ToAircraftData();
-            });
+            }, ct);
 
-            return new OkObjectResult(aircraftData);
+            var ok = req.CreateResponse(HttpStatusCode.OK);
+            await ok.WriteAsJsonAsync(aircraftData, ct);
+            return ok;
         }
         catch (Exception ex)
         {

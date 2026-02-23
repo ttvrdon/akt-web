@@ -8,6 +8,7 @@ public class DataCache
 {
     private readonly IMemoryCache _memoryCache;
     private readonly AppConfiguration _configuration;
+    private readonly SemaphoreSlim _mutex = new(1, 1);
 
     public DataCache(IMemoryCache memoryCache, IOptions<AppConfiguration> configuration)
     {
@@ -15,29 +16,34 @@ public class DataCache
         _configuration = configuration.Value;
     }
 
-    public Task<AircraftData> GetCachedAircraftData(Func<Task<AircraftData>> dataGetter)
+    public Task<AircraftData> GetCachedAircraftData(string aircraftId, Func<Task<AircraftData>> dataGetter, CancellationToken ct)
     {
-        return GetCachedData(dataGetter, nameof(GetCachedAircraftData));
+        return GetCachedData(dataGetter, aircraftId, ct);
     }
 
-    public Task<FuelData> GetCachedFuelData(Func<Task<FuelData>> dataGetter)
+    public Task<FuelData> GetCachedFuelData(Func<Task<FuelData>> dataGetter, CancellationToken ct)
     {
-        return GetCachedData(dataGetter, nameof(GetCachedFuelData));
+        return GetCachedData(dataGetter, nameof(GetCachedFuelData), ct);
     }
 
     //AircraftDataCacheKey
-    private async Task<T> GetCachedData<T>(Func<Task<T>> dataGetter, string cacheKey)
+    private async Task<T> GetCachedData<T>(Func<Task<T>> dataGetter, string cacheKey, CancellationToken ct)
     {
         // Try to get from cache
         if (!_memoryCache.TryGetValue(cacheKey, out T? data))
         {
-            data = await dataGetter();
+            await _mutex.WaitAsync(ct);
 
-            // Set cache with expiration
-            var cacheEntryOptions = new MemoryCacheEntryOptions()
-                .SetAbsoluteExpiration(_configuration.CacheExpiry);
+            if (!_memoryCache.TryGetValue(cacheKey, out data))
+            {
+                data = await dataGetter();
 
-            _memoryCache.Set(cacheKey, data, cacheEntryOptions);
+                // Set cache with expiration
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetAbsoluteExpiration(_configuration.CacheExpiry);
+
+                _memoryCache.Set(cacheKey, data, cacheEntryOptions);
+            }
         }
 
         return data!;

@@ -4,10 +4,7 @@ public static class Mappers
 {
     public static AircraftData ToAircraftData(this AircraftRawData rawData)
     {
-        if (rawData == null)
-        {
-            throw new ArgumentNullException(nameof(rawData));
-        }
+        ArgumentNullException.ThrowIfNull(rawData);
 
         var total = GetHoursAndMinutes(rawData.Total);
         var fromReconstruction = GetHoursAndMinutes(rawData.FromReconstruction);
@@ -16,7 +13,7 @@ public static class Mappers
 
         return new AircraftData
         {
-            Aircraft = rawData.Aircraft,
+            AircraftId = rawData.PartitionKey,
             TotalHours = total.Hours,
             TotalMinutes = total.Minutes,
             FromReconstructionHours = fromReconstruction.Hours,

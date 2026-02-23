@@ -1,21 +1,19 @@
-﻿using AktWeb.Functions.Model.Converters;
-using System.Text.Json.Serialization;
+﻿using System.Runtime.Serialization;
 
 namespace AktWeb.Functions.Model;
 
-public class AircraftRawData
+[DataContract]
+public class AircraftRawData : TableEntityBase
 {
-    public required string Aircraft { get; set; }
-
-    [JsonConverter(typeof(FlexibleDoubleConverter))]
+    [DataMember(Name = "total")]
     public required double Total { get; set; }
 
-    [JsonConverter(typeof(FlexibleDoubleConverter))]
+    [DataMember(Name = "fromReconstruction")]
     public required double FromReconstruction { get; set; }
 
-    [JsonConverter(typeof(FlexibleDoubleConverter))]
+    [DataMember(Name = "fromAnnual")]
     public required double FromAnnual { get; set; }
 
-    [JsonConverter(typeof(FlexibleDoubleConverter))]
+    [DataMember(Name = "nextServiceIn")]
     public required double NextServiceIn { get; set; }
 }

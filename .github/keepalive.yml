@@ -1,0 +1,23 @@
+name: Azure Function Keep-Alive
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Random Delay and Ping
+        run: |
+          # Vygeneruje náhodné číslo mezi 0 a 120 sekundami (2 minuty)
+          # Tím se efektivně posune čas pingu mezi 5. až 7. minutou
+          DELAY=$(( RANDOM % 121 ))
+          echo "Waiting for $DELAY seconds to look natural..."
+          sleep $DELAY
+          
+          # Samotný ping na tvou funkci
+          # Nahraď URL svou skutečnou adresou!
+          curl -I -s https://akt-zs.cz/api/keepalive \
+            -o /dev/null -w "Status code: %{http_code}\n"
