@@ -2,7 +2,7 @@
 
 public class AircraftData
 {
-    public required string Aircraft { get; set; }
+    public required string AircraftId { get; set; }
 
     public required int TotalHours { get; set; }
     public required int TotalMinutes { get; set; }
