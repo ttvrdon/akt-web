@@ -2,7 +2,7 @@ name: Azure Function Keep-Alive
 
 on:
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '*/8 * * * *'
   workflow_dispatch:
 permissions: {}  # least privileges
 
@@ -12,9 +12,8 @@ jobs:
     steps:
       - name: Random Delay and Ping
         run: |
-          # Generates random number between 0 and 120 seconds (2 minutes)
-          # This effectively shifts the ping time between the 5th and 7th minute
-          DELAY=$(( RANDOM % 121 ))
+          # Generates random number between 0 and 30 seconds
+          DELAY=$(( RANDOM % 31 ))
           echo "Waiting for $DELAY seconds to look natural..."
           sleep $DELAY
           
