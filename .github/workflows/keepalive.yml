@@ -18,5 +18,4 @@ jobs:
           echo "Waiting for $DELAY seconds to look natural..."
           sleep $DELAY
           
-          curl -I -s https://akt-zs.cz/api/keepAlive \
-            -o /dev/null -w "Status code: %{http_code}\n"
+          curl -s -o /dev/null -w "Status code: %{http_code}\n" https://akt-zs.cz/api/keepAlive
