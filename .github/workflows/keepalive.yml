@@ -4,6 +4,7 @@ on:
   schedule:
     - cron: '*/5 * * * *'
   workflow_dispatch:
+permissions: {}  # least privileges
 
 jobs:
   ping:
@@ -11,13 +12,11 @@ jobs:
     steps:
       - name: Random Delay and Ping
         run: |
-          # Vygeneruje náhodné číslo mezi 0 a 120 sekundami (2 minuty)
-          # Tím se efektivně posune čas pingu mezi 5. až 7. minutou
+          # Generates random number between 0 and 120 seconds (2 minutes)
+          # This effectively shifts the ping time between the 5th and 7th minute
           DELAY=$(( RANDOM % 121 ))
           echo "Waiting for $DELAY seconds to look natural..."
           sleep $DELAY
           
-          # Samotný ping na tvou funkci
-          # Nahraď URL svou skutečnou adresou!
-          curl -I -s https://akt-zs.cz/api/keepalive \
+          curl -I -s https://akt-zs.cz/api/keepAlive \
             -o /dev/null -w "Status code: %{http_code}\n"
