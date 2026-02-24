@@ -16,7 +16,7 @@ public static class Mappers
 
         return new AircraftData
         {
-            Aircraft = rawData.Aircraft,
+            AircraftId = rawData.PartitionKey,
             TotalHours = total.Hours,
             TotalMinutes = total.Minutes,
             FromReconstructionHours = fromReconstruction.Hours,

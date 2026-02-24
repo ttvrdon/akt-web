@@ -1,9 +1,9 @@
-using AktWeb.Functions.BlobStorage;
 using AktWeb.Functions.Caching;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+using AktWeb.Functions.TableStorage;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
+using System.Net;
 
 namespace AktWeb.Functions.Functions;
 
@@ -11,12 +11,12 @@ public class GetFuelData
 {
     private readonly ILogger<GetFuelData> _logger;
     private readonly DataCache _dataCache;
-    private readonly StorageClient _storageClient;
+    private readonly TableStorageClient _storageClient;
 
     public GetFuelData(
         ILogger<GetFuelData> logger,
         DataCache cache,
-        StorageClient storageClient)
+        TableStorageClient storageClient)
     {
         _logger = logger;
         _dataCache = cache;
@@ -24,7 +24,10 @@ public class GetFuelData
     }
 
     [Function(nameof(GetFuelData))]
-    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
+    public async Task<HttpResponseData> Run(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get")]
+        HttpRequestData req,
+        CancellationToken ct)
     {
         _logger.LogInformation("Processing request in GetFuelData Function.");
 
@@ -32,10 +35,12 @@ public class GetFuelData
         {
             var fuelData = await _dataCache.GetCachedFuelData(async () =>
             {
-                return await _storageClient.GetFuelData();
-            });
+                return await _storageClient.GetFuelData(ct);
+            }, ct);
 
-            return new OkObjectResult(fuelData);
+            var ok = req.CreateResponse(HttpStatusCode.OK);
+            await ok.WriteAsJsonAsync(fuelData, ct);
+            return ok;
         }
         catch (Exception ex)
         {
